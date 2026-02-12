@@ -1,0 +1,22 @@
+.game {
+  position: relative;
+  height: 50%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dino {
+  position: absolute;
+  width: 100px;
+  left: 0;
+  height: 100px;
+  background-color: black;
+}
+.cactus {
+  position: absolute;
+  width: 50px;
+  bottom: 0;
+  height: 100px;
+  background-color: green;
+}
