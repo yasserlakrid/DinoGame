@@ -7,7 +7,7 @@ function Game() {
   const [Xdim, setXdim] = useState(0);
 
   const [discac, setcac] = useState(false);
-  const [Ydim, setYdim] = useState(0);
+  const [Ydim, setYdim] = useState([{x : 0 , visible : true}]);
   var start = false;
   function jumpAnimation() {
     var x = 0;
@@ -31,22 +31,31 @@ function Game() {
     }, 10);
   }
   function cactusAnimation() {
-    var y = 0;
-
-    setcac(true);
+    setcac(true)
     const int = setInterval(() => {
-      if (y == 200) {
-        setcac(false);
-        clearInterval(int);
-      }
-      y++;
-      setYdim(y);
+      setYdim((prev)=> {
+        return prev.map((c) => ({
+          ...c,
+          x: c.x <= 400 ? c.x ++ : c.x = c.x,
+          visible: c.x + 1 < 400 ? true : false,
+        }));
+      });
     }, 10);
+  }
+
+  function addcactus() {
+    let randomT = Math.random() * 100;
+    console.log(randomT,Ydim);
+    
+    setTimeout(() => {
+      var a = {x : 0 , visible : true};
+      setYdim((arr) => [...arr, a]);
+      console.log("added a cactus", Ydim);
+    }, randomT);
   }
 
   useEffect(() => {
     const handleUp = (e) => {
-      console.log(e.key);
       if (e.key == "ArrowUp" && start) {
         jumpAnimation();
       }
@@ -72,17 +81,27 @@ function Game() {
           bottom: Xdim + "px",
         }}
       ></div>
+
+      <button onClick={addcactus}> add a cactus</button>
       {discac ? (
-        <div
-          className="cactus"
-          style={{
-            right: Ydim + "px",
-          }}
-        ></div>
-      ) : (
-        <></>
+        Ydim.map((c,index)=>(            
+              <div
+            key={index}
+            className="cactus"
+            style={{
+              right: c.x+ "px",
+              display : c.visible ? 'block' : 'none'
+            }}
+          ></div>
+     
+            
+        ))
+      ):(
+        <div>
+          
+          </div>
       )}
     </div>
-  );
+  )
 }
 export default Game;
