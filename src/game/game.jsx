@@ -5,7 +5,9 @@ import "./game.css";
 function Game() {
   const [isJumping, setIsJumping] = useState(false);
   const [Xdim, setXdim] = useState(0);
-
+  const [gameOver , setGameOver] = useState(false);
+var last = 0 ;
+var int1 ;
   const [discac, setcac] = useState(false);
   const [Ydim, setYdim] = useState([{x : 0 , visible : true}]);
   var start = false;
@@ -14,7 +16,7 @@ function Game() {
     var reached = false;
 
     const int = setInterval(() => {
-      if (x == 50) {
+      if (x == 120) {
         reached = true;
       }
       if (!reached) {
@@ -28,24 +30,27 @@ function Game() {
         clearInterval(int);
       }
       setXdim(x);
-    }, 10);
+    },10 
+  );
   }
-  function cactusAnimation() {
-    setcac(true)
-    const int = setInterval(() => {
-      setYdim((prev)=> {
-        return prev.map((c) => ({
-          ...c,
-          x: c.x <= 400 ? c.x ++ : c.x = c.x,
-          visible: c.x + 1 < 400 ? true : false,
-        }));
-      });
-    }, 10);
-  }
+function cactusAnimation() {
+  setcac(true);
+  int1 = setInterval(() => {
+    setYdim(prev => {
+      const newYdim = prev
+        .map(c => ({ ...c, x: c.x + 1, visible: c.x + 1 < 700 }))
+        .filter(c => c.visible);
+
+      
+      return newYdim;
+    });
+  }, 10);
+}
+
 
   function addcactus() {
     let randomT = Math.random() * 100;
-    console.log(randomT,Ydim);
+    last ++ ;
     
     setTimeout(() => {
       var a = {x : 0 , visible : true};
@@ -53,8 +58,17 @@ function Game() {
       console.log("added a cactus", Ydim);
     }, randomT);
   }
+  if (Xdim < 40 && Ydim[0].x > 600) {
+        console.log("game over babe");
+        setGameOver(true);
+        clearInterval(int1); 
+      }
 
   useEffect(() => {
+ 
+ 
+ 
+  
     const handleUp = (e) => {
       if (e.key == "ArrowUp" && start) {
         jumpAnimation();
@@ -83,6 +97,16 @@ function Game() {
       ></div>
 
       <button onClick={addcactus}> add a cactus</button>
+      {gameOver ? (
+        <div>
+          Game over 
+        </div>
+      ):(
+<div>
+  Game is running
+</div>
+      )}
+
       {discac ? (
         Ydim.map((c,index)=>(            
               <div
@@ -91,6 +115,7 @@ function Game() {
             style={{
               right: c.x+ "px",
               display : c.visible ? 'block' : 'none'
+
             }}
           ></div>
      
