@@ -10,9 +10,10 @@ var last = 0 ;
 var int1 ;
   const [discac, setcac] = useState(false);
   const [Ydim, setYdim] = useState([{x : 0 , visible : true}]);
-  var start = false;
+  
   function jumpAnimation() {
-    var x = 0;
+   
+      var x = 0;
     var reached = false;
 
     const int = setInterval(() => {
@@ -32,51 +33,64 @@ var int1 ;
       setXdim(x);
     },10 
   );
+
+  
+    
   }
+
 function cactusAnimation() {
-  setcac(true);
+  
+ setcac(true);
   int1 = setInterval(() => {
-    setYdim(prev => {
+    
+      setYdim(prev => {
       const newYdim = prev
         .map(c => ({ ...c, x: c.x + 1, visible: c.x + 1 < 700 }))
         .filter(c => c.visible);
-
-      
       return newYdim;
     });
+    
+    
   }, 10);
+
+ 
 }
 
-
+// add a cactus after a random time 
   function addcactus() {
+
     let randomT = Math.random() * 100;
     last ++ ;
     
     setTimeout(() => {
       var a = {x : 0 , visible : true};
       setYdim((arr) => [...arr, a]);
-      console.log("added a cactus", Ydim);
     }, randomT);
   }
-  if (Xdim < 40 && Ydim[0].x > 600) {
-        console.log("game over babe");
-        setGameOver(true);
-        clearInterval(int1); 
-      }
+ 
 
-  useEffect(() => {
- 
- 
- 
-  
+  useEffect(()=>{
+    if(Ydim.length ){
+      if(Ydim[0].x > 650 && Xdim < 60){
+        setGameOver(true)
+      }
+    }
+
+
+  },[Ydim])
+  useEffect(()=>{
+    if(gameOver){
+      console.log("game over babe ")
+    }
+  },[gameOver])
+  useEffect(() => {  
     const handleUp = (e) => {
-      if (e.key == "ArrowUp" && start) {
-        jumpAnimation();
+      if (e.key == "ArrowUp" ) {
+       jumpAnimation()
       }
-
       if (e.key == "Enter") {
-        cactusAnimation();
-        start = true;
+       
+     cactusAnimation();
       }
     };
 
