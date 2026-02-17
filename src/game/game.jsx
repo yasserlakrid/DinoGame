@@ -17,6 +17,7 @@ var int1 ;
     var reached = false;
 
     const int = setInterval(() => {
+      setIsJumping(true);
       if (x == 120) {
         reached = true;
       }
@@ -27,7 +28,7 @@ var int1 ;
       if (reached) {
         x--;
       }
-      if (x == 0) {
+      if (x == 0) {     
         clearInterval(int);
       }
       setXdim(x);
@@ -78,15 +79,28 @@ function cactusAnimation() {
 
 
   },[Ydim])
+
   useEffect(()=>{
     if(gameOver){
+
       console.log("game over babe ")
     }
   },[gameOver])
+  useEffect(()=>{
+    if(Xdim){
+      setIsJumping(true)
+    }else{
+      setIsJumping(false)
+    }
+  },)
+
   useEffect(() => {  
     const handleUp = (e) => {
-      if (e.key == "ArrowUp" ) {
-       jumpAnimation()
+      if (e.key == "ArrowUp" && !isJumping) {
+console.log(Xdim)
+jumpAnimation()
+        
+        
       }
       if (e.key == "Enter") {
        
@@ -99,7 +113,8 @@ function cactusAnimation() {
     return () => {
       window.removeEventListener("keydown", handleUp);
     };
-  }, []);
+  }, [isJumping]);
+  
 
   return (
     <div className="game justify-center items-center">
