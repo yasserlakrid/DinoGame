@@ -6,6 +6,9 @@ function Game() {
   const [isJumping, setIsJumping] = useState(false);
   const [Xdim, setXdim] = useState(0);
   const [gameOver , setGameOver] = useState(false);
+  const [level , changeLevel] = useState(5000);
+  const [score , setScore]= useState(0);
+
 var last = 0 ;
 var int1 ;
   const [discac, setcac] = useState(false);
@@ -58,16 +61,32 @@ function cactusAnimation() {
 }
 
 // add a cactus after a random time 
-  function addcactus() {
-
-    let randomT = Math.random() * 100;
+ useEffect(()=>{
+  let randomT = Math.random() * 100;
     last ++ ;
-    
-    setTimeout(() => {
+    let cacShowing = setInterval(() => {
+      console.log(gameOver)
+      if(gameOver){
+        console.log("cleared interval ")
+        clearInterval(cacShowing)
+      }else{
+        setTimeout(() => {
+      
       var a = {x : 0 , visible : true};
       setYdim((arr) => [...arr, a]);
+      console.log("added cactus")
     }, randomT);
-  }
+      }
+     
+    }, level);
+    return ()=> clearInterval(cacShowing)
+    
+ },[gameOver])
+    
+   
+  
+    
+  
  
 
   useEffect(()=>{
@@ -78,7 +97,7 @@ function cactusAnimation() {
     }
 
 
-  },[Ydim])
+  },[Ydim , Xdim])
 
   useEffect(()=>{
     if(gameOver){
@@ -97,14 +116,11 @@ function cactusAnimation() {
   useEffect(() => {  
     const handleUp = (e) => {
       if (e.key == "ArrowUp" && !isJumping) {
-console.log(Xdim)
-jumpAnimation()
-        
-        
+jumpAnimation()          
       }
-      if (e.key == "Enter") {
-       
-     cactusAnimation();
+      if (e.key == "Enter" && !gameOver) {
+     
+       cactusAnimation();
       }
     };
 
@@ -125,7 +141,7 @@ jumpAnimation()
         }}
       ></div>
 
-      <button onClick={addcactus}> add a cactus</button>
+      
       {gameOver ? (
         <div>
           Game over 
