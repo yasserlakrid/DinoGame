@@ -1,27 +1,36 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { use } from "react";
+import { useState, useEffect ,useRef } from "react";
 import "./game.css";
+let died = "/src/components/dizzy.png"
+let alive = "/src/components/in-love.png"
 
 function Game() {
   const [isJumping, setIsJumping] = useState(false);
+  const [start , setStart] = useState(false);
   const [Xdim, setXdim] = useState(0);
   const [gameOver , setGameOver] = useState(false);
-  const [level , changeLevel] = useState(5000);
-  const [score , setScore]= useState(0);
-
+  const [level , changeLevel] = useState(1);
+  const dif = useRef(3200)
+  const speed = useRef(0.9);
 var last = 0 ;
-var int1 ;
+const int1 = useRef(null);
+const int = useRef(null);
+const cacShowing = useRef(null)
+const gameDur = useRef(null)
   const [discac, setcac] = useState(false);
   const [Ydim, setYdim] = useState([{x : 0 , visible : true}]);
   
+
   function jumpAnimation() {
    
       var x = 0;
     var reached = false;
-
-    const int = setInterval(() => {
+   if(int.current){
+    clearInterval(int.current)
+   }
+   int.current = setInterval(() => {
       setIsJumping(true);
-      if (x == 120) {
+      if (x == 155) {
         reached = true;
       }
       if (!reached) {
@@ -32,10 +41,10 @@ var int1 ;
         x--;
       }
       if (x == 0) {     
-        clearInterval(int);
+        clearInterval(int.current);
       }
       setXdim(x);
-    },10 
+    },5
   );
 
   
@@ -43,84 +52,112 @@ var int1 ;
   }
 
 function cactusAnimation() {
-  
  setcac(true);
-  int1 = setInterval(() => {
-    
+
+  if(int1.current){
+    clearInterval(int1.current)
+  }
+  int1.current = setInterval(() => {
       setYdim(prev => {
       const newYdim = prev
-        .map(c => ({ ...c, x: c.x + 1, visible: c.x + 1 < 700 }))
+      
+        .map(c => ({ ...c, x: c.x + speed.current, visible: c.x + speed.current < 700 }))
         .filter(c => c.visible);
       return newYdim;
     });
     
-    
-  }, 10);
-
- 
+  }, 1);
 }
+// change the difficulty over time 
+useEffect(()=>{
+  if(gameOver){
+
+    clearInterval(gameDur.current)
+  }
+  gameDur.current = setInterval(() => {
+    if(dif.current > 1400){
+      dif.current = dif.current - 100 ;
+      speed.current = speed.current + 0.05
+      changeLevel(prev => prev + 1)
+    }
+    
+
+  }, 3500);
+
+  return ( )=> clearInterval(gameDur.current)
+},[gameOver,dif,speed])
 
 // add a cactus after a random time 
+
  useEffect(()=>{
-  let randomT = Math.random() * 100;
-    last ++ ;
-    let cacShowing = setInterval(() => {
+
+    if(cacShowing.current){
+      clearInterval(cacShowing.current);
+    }
+    console.log("the new diffeculty is : " , dif.current)
+     cacShowing.current = setInterval(() => {
       console.log(gameOver)
       if(gameOver){
-        console.log("cleared interval ")
-        clearInterval(cacShowing)
+        clearInterval(cacShowing.current)
       }else{
-        setTimeout(() => {
-      
       var a = {x : 0 , visible : true};
       setYdim((arr) => [...arr, a]);
       console.log("added cactus")
-    }, randomT);
       }
      
-    }, level);
-    return ()=> clearInterval(cacShowing)
+    }, dif.current);
+    return ()=>clearInterval(cacShowing.current)
     
- },[gameOver])
+ },[dif.current])
     
    
   
     
-  
+  function restart(){
+    setGameOver(false);
+    setXdim(0);
+    setYdim([{x:0,visible:true}]);
+    cactusAnimation();
+   
+    dif.current = 3200;
+    speed.current = 0.9 
+  }
  
 
+// check for collision
   useEffect(()=>{
     if(Ydim.length ){
-      if(Ydim[0].x > 650 && Xdim < 60){
+      if(Ydim[0].x > 610 && Xdim < 75){
         setGameOver(true)
+        setcac(false)
       }
     }
 
 
   },[Ydim , Xdim])
 
-  useEffect(()=>{
-    if(gameOver){
 
-      console.log("game over babe ")
-    }
-  },[gameOver])
+//prevent multiple jumps
+
   useEffect(()=>{
     if(Xdim){
       setIsJumping(true)
     }else{
       setIsJumping(false)
     }
-  },)
+  },[Xdim])
 
   useEffect(() => {  
     const handleUp = (e) => {
-      if (e.key == "ArrowUp" && !isJumping) {
-jumpAnimation()          
+      if (e.key == "ArrowUp" && !isJumping && !gameOver)  {
+
+      jumpAnimation()          
       }
+
       if (e.key == "Enter" && !gameOver) {
-     
        cactusAnimation();
+       setStart(true);
+
       }
     };
 
@@ -129,7 +166,7 @@ jumpAnimation()
     return () => {
       window.removeEventListener("keydown", handleUp);
     };
-  }, [isJumping]);
+  }, [isJumping,gameOver]);
   
 
   return (
@@ -138,17 +175,40 @@ jumpAnimation()
         className="dino "
         style={{
           bottom: Xdim + "px",
+           backgroundImage : gameOver ? `url(${died})` : `url(${alive})`,
+          animation : gameOver ?'' : 'run 1s ease-in-out infinite'
+          
         }}
       ></div>
 
       
       {gameOver ? (
+        <>
         <div>
           Game over 
+          
         </div>
+        <button onClick={restart} className="Restart">
+            restart
+          </button>
+        </>
+        
       ):(
 <div>
-  Game is running
+  {  start ? (
+    <div>
+      <h3>
+         the game is running
+      </h3>
+     
+      </div>
+  ):(
+<div> 
+  press enter to start
+      </div>
+  )
+  
+  }
 </div>
       )}
 
@@ -159,7 +219,8 @@ jumpAnimation()
             className="cactus"
             style={{
               right: c.x+ "px",
-              display : c.visible ? 'block' : 'none'
+              display : c.visible ? 'block' : 'none',
+             
 
             }}
           ></div>

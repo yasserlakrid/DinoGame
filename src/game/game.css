@@ -6,18 +6,60 @@
   justify-content: center;
   align-items: center;
   border-bottom : 2px solid black;
+  background-image: url(/src/components/backGround.jpg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: 0px 80px;
+  color: #FF6B00;
+  -webkit-text-stroke: 0.5px black;
+  font-size: x-large;
+  font-weight: bold;
 }
 .dino {
   position: absolute;
   width: 60px;
   left: 0;
   height: 60px;
-  background-color: black;
+  background-color: transparent;
+  background-size: 60px;
+  background-image: url(/src/components/in-love.png);
+  background-size: contain;
+  
+  will-change: transform;
 }
+
+@keyframes run {
+  0%   { transform: scaleX(1) translateY(0); }
+  25%  { transform: scaleX(0.95) translateY(-4px); }
+  50%  { transform: scaleX(1) translateY(0); }
+  75%  { transform: scaleX(0.95) translateY(-4px); }
+  100% { transform: scaleX(1) translateY(0); }
+}
+
+@keyframes float {
+ 0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+
 .cactus {
   position: absolute;
   width: 50px;
   bottom: 0;
   height: 60px;
-  background-color: green;
+  background-image: url(/src/components/flying.png);
+  background-size: contain;
+  animation: float 1s ease-in-out infinite;
+  will-change: transform;
+}
+
+.Restart{
+  position : absolute;
+  top : 300px ;
+  width: 100px;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background-color: #FF6B00;
 }
